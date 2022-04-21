@@ -9,19 +9,11 @@ converts:
   - name: sprites
     palette: global_palette
     transparent-color-index: 0
-    images:
-      - blank.png
-      - hidden.png
-      - flag.png
-      - mine.png
-      - one.png
-      - two.png
-      - three.png
-      - four.png
-      - five.png
-      - six.png
-      - seven.png
-      - eight.png
+    tilesets:
+      tile-width: 12
+      tile-height: 12
+      images:
+        - tilemap.png
 
 outputs:
   - type: c
