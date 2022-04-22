@@ -58,9 +58,9 @@ void Clear(Board* b, int x, int y)
 int NearMines(Board* b, int x, int y)
 {
     int mines = 0;
-    for (int i = MAX(y - 1, 0); i < MIN(y + 1, b->height); i++)
+    for (int i = MAX(y - 1, 0); i <= MIN(y + 1, b->height); i++)
     {
-        for (int j = MAX(x - 1, 0); j < MIN(x + 1, b->width); j++)
+        for (int j = MAX(x - 1, 0); j <= MIN(x + 1, b->width); j++)
         {
             if (b->data[i][j] == 1) mines++;
         }
