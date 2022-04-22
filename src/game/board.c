@@ -32,26 +32,9 @@ Board* GenerateBoard(unsigned int w, unsigned int h, unsigned int mines)
     return b;
 }
 
-void DisplayBoard(Board* b)
-{
-    for (unsigned int y = 0; y < b->height; y++)
-    {
-        for (unsigned int x = 0; x < b->width; x++)
-        {
-            if (b->data[y][x])
-            {
-                gfx_SetColor(0x00);
-                gfx_FillRectangle_NoClip(x * 5 + 1, y * 5 + 1, 3, 3);
-            }
-        }
-    }
-
-    return;
-}
-
 void FreeBoard(Board* b)
 {
-    for (unsigned int i = 0; i < b->height; b++)
+    for (unsigned int i = 0; i < b->height; i++)
     {
         free(b->data[i]);
     }

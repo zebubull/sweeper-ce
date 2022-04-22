@@ -10,7 +10,6 @@ typedef struct
 } Board;
 
 Board* GenerateBoard(unsigned int w, unsigned int h, unsigned int mines); 
-void DisplayBoard(Board* b);
 void FreeBoard(Board* b);
 
 #endif
