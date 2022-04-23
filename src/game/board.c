@@ -45,7 +45,7 @@ Board* GenerateBoard(int w, int h, int mines, int x, int y)
     {
         int mx = randInt(0, w-1);
         int my = randInt(0, h-1);
-        while (!IsValid(x, y, mx, my, w, h) && !IsMine(b, mx, my))
+        while (!IsValid(x, y, mx, my, w, h) || IsMine(b, mx, my))
         {
             mx = randInt(0, w-1);
             my = randInt(0, h-1);

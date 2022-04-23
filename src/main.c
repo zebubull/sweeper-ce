@@ -40,7 +40,6 @@ int main(void)
     timer_Disable(1);
     timer_Set(1, TIMER_FREQ);
     timer_SetReload(1, TIMER_FREQ);
-    timer_Enable(1, TIMER_32K, TIMER_0INT, TIMER_DOWN);
 
     do
     {
@@ -53,12 +52,13 @@ int main(void)
         if (kb_RisingEdge(okb_Down, kb_Down) && py < BOARD_HEIGHT - 1) py++;
 
         // Reveal Square
-        if (kb_RisingEdge(okb_Enter, kb_Enter) && !Cleared(board, px, py) && !IsFlagged(board, px, py))
+        if (kb_RisingEdge(okb_Enter, kb_Enter) && ((!Cleared(board, px, py) && !IsFlagged(board, px, py)) || first))
         {
             if (first)
             {
                 board = GenerateBoard(BOARD_WIDTH, BOARD_HEIGHT, NUM_MINES, px, py);
                 Reveal(board, px, py, tilemap, &hidden);
+                timer_Enable(1, TIMER_32K, TIMER_0INT, TIMER_DOWN);
                 first = false;
             }
 
@@ -187,7 +187,8 @@ void Lose(Board* b, gfx_tilemap_t* t, int flags, int seconds)
 void Cleanup(Board* b, gfx_tilemap_t* t)
 {
     gfx_End();
-    FreeBoard(b);
+    if (b)
+        FreeBoard(b);
     FreeTilemap(t);
 }
 
