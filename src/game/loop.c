@@ -33,13 +33,13 @@ int loop(int width, int height)
         ReadKeypad();
 
         // Read User Input
-        if (kb_RisingEdge(okb_Left, kb_Left) && px > 0) px--;
-        if (kb_RisingEdge(okb_Right, kb_Right) && px < width - 1) px++;
-        if (kb_RisingEdge(okb_Up, kb_Up) && py > 0) py--;
-        if (kb_RisingEdge(okb_Down, kb_Down) && py < height - 1) py++;
+        if (kb_FallingEdge(okb_Left, kb_Left) && px > 0) px--;
+        if (kb_FallingEdge(okb_Right, kb_Right) && px < width - 1) px++;
+        if (kb_FallingEdge(okb_Up, kb_Up) && py > 0) py--;
+        if (kb_FallingEdge(okb_Down, kb_Down) && py < height - 1) py++;
 
         // Reveal Square
-        if (kb_RisingEdge(okb_Enter, kb_Enter) && ((!Cleared(board, px, py) && !IsFlagged(board, px, py)) || first))
+        if (kb_FallingEdge(okb_Enter, kb_Enter) && ((!Cleared(board, px, py) && !IsFlagged(board, px, py)) || first))
         {
             if (first)
             {
@@ -59,7 +59,7 @@ int loop(int width, int height)
         }
 
         // Toggle Flag
-        if (kb_RisingEdge(okb_Add, kb_Add) && !Cleared(board, px, py) && !first)
+        if (kb_FallingEdge(okb_Add, kb_Add) && !Cleared(board, px, py) && !first)
         {
             ToggleFlag(board, px, py);
 
@@ -86,7 +86,7 @@ int loop(int width, int height)
             {
                 ReadKeypad();
             }
-            while (!kb_RisingEdge(okb_Del, kb_Del));
+            while (!kb_FallingEdge(okb_Del, kb_Del));
             break;
         }
 
@@ -166,7 +166,7 @@ void Lose(Board* b, gfx_tilemap_t* t, int flags, int seconds)
     {
         ReadKeypad();
     }
-    while (!kb_RisingEdge(okb_Del, kb_Del));
+    while (!kb_FallingEdge(okb_Del, kb_Del));
 }
 
 void Cleanup(Board* b, gfx_tilemap_t* t, bool first)
