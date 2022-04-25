@@ -16,6 +16,8 @@ converts:
       tile-height: 12
       images:
         - tilemap.png
+    images:
+    - titlecard.png
 
 outputs:
   - type: c

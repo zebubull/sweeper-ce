@@ -10,11 +10,11 @@ gfx_tilemap_t* CreateTilemap(unsigned int width, unsigned int height)
     tilemap->type_height = gfx_tile_no_pow2;
     tilemap->tile_width = TILE_WIDTH;
     tilemap->tile_height = TILE_HEIGHT;
-    tilemap->draw_width = 12;
-    tilemap->draw_height = 20;
+    tilemap->draw_width = width;
+    tilemap->draw_height = height;
     tilemap->width = width;
     tilemap->height = height;
-    tilemap->x_loc = gfx_lcdWidth / 2 - TILE_WIDTH * width / 2;
+    tilemap->x_loc = 80;
     tilemap->y_loc = 0;
 
     return tilemap;
