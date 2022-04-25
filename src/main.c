@@ -21,6 +21,7 @@ void Reveal(Board* b, int x, int y, gfx_tilemap_t* t, int* h);
 void Lose(Board* b, gfx_tilemap_t* t, int flags, int seconds);
 void Cleanup(Board* b, gfx_tilemap_t* t);
 void DrawUI(int flags, int seconds);
+void PrintCenter(const char* msg);
 
 int main(void)
 {
@@ -91,14 +92,14 @@ int main(void)
         {
             timer_Disable(1);
             gfx_SetTextFGColor(0x01);
-            gfx_PrintStringXY("you win!", 2, 114);
+            PrintCenter("you win!");
             DrawUI(flags, seconds);
             gfx_SwapDraw();
             do
             {
                 ReadKeypad();
             }
-            while (!kb_RisingEdge(okb_Enter, kb_Enter));
+            while (!kb_RisingEdge(okb_Del, kb_Del));
             break;
         }
 
@@ -170,7 +171,7 @@ void Lose(Board* b, gfx_tilemap_t* t, int flags, int seconds)
 
     timer_Disable(1);
     gfx_SetTextFGColor(0x01);
-    gfx_PrintStringXY("you lose", 2, 114);
+    PrintCenter("you lose");
     DrawUI(flags, seconds);
     gfx_SwapDraw();
 
@@ -178,7 +179,7 @@ void Lose(Board* b, gfx_tilemap_t* t, int flags, int seconds)
     {
         ReadKeypad();
     }
-    while (!kb_RisingEdge(okb_Enter, kb_Enter));
+    while (!kb_RisingEdge(okb_Del, kb_Del));
     Cleanup(b, t);
     exit(0);
     
@@ -201,6 +202,15 @@ void DrawUI(int flags, int seconds)
     gfx_PrintStringXY("Mines Left:", 2, LCD_HEIGHT - 24);
     gfx_SetTextXY(2, LCD_HEIGHT - 12);
     gfx_PrintInt(flags, 1);
+    // Controls
+    gfx_PrintStringXY("Enter:", 2, 16);
+    gfx_PrintStringXY("Reveal", 2, 28);
+    gfx_PrintStringXY("+:", 2, 42);
+    gfx_PrintStringXY("Flag", 2, 54);
+    gfx_PrintStringXY("Arrows:", 2, 70);
+    gfx_PrintStringXY("Move", 2, 82);
+    gfx_PrintStringXY("Del:", 2, 98);
+    gfx_PrintStringXY("Quit", 2, 110);
     // Timer
     int mins = seconds / 60;
     int secs = seconds - mins * 60;
@@ -210,4 +220,14 @@ void DrawUI(int flags, int seconds)
     gfx_PrintInt(mins, 2);
     gfx_PrintChar(':');
     gfx_PrintInt(secs, 2);
+}
+
+void PrintCenter(const char* msg)
+{
+    gfx_SetColor(0x02);
+    gfx_FillRectangle_NoClip(LCD_WIDTH / 2 - 35, LCD_HEIGHT / 2 - 8, 68, 16);
+    gfx_SetColor(0x01);
+    gfx_Rectangle_NoClip(LCD_WIDTH / 2 - 35, LCD_HEIGHT / 2 - 8, 68, 16);
+    gfx_Rectangle_NoClip(LCD_WIDTH / 2 - 32, LCD_HEIGHT / 2 - 6, 62, 12);
+    gfx_PrintStringXY(msg, LCD_WIDTH / 2 - 28, LCD_HEIGHT / 2 - 4);
 }
