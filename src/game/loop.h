@@ -10,7 +10,7 @@
 
 #define TIMER_FREQ 32768
 
-void Reveal(Board* b, int x, int y, gfx_tilemap_t* t, int* h);
+void Reveal(Board* b, int x, int y, gfx_tilemap_t* t);
 void Lose(Board* b, gfx_tilemap_t* t, int flags, int seconds);
 void Cleanup(Board* b, gfx_tilemap_t* t, bool first);
 void DrawUI(int flags, int seconds);

@@ -80,20 +80,20 @@ void Clear(Board* b, int x, int y)
 int NearMines(Board* b, int x, int y)
 {
     int mines = 0;
-    for (int i = MAX(y - 1, 0); i <= MIN(y + 1, b->height); i++)
+    for (int i = y - 1; i <= y + 1; i++)
     {
-        for (int j = MAX(x - 1, 0); j <= MIN(x + 1, b->width); j++)
+        for (int j = x - 1; j <= x + 1; j++)
         {
-            if (IsMine(b, j, i)) mines++;
+            if (i == y && x == j) continue;
+            mines += IsMine(b, j, i);
         }
     }
-    // For some fucking reason you need this? I have no goddamn idea at this point
-    if (y == b->height - 1 && x >= 3 && x <= 5) mines--;
     return mines;
 }
 
 bool IsMine(Board* b, int x, int y)
 {
+    if (x < 0 || y < 0 || x >= b->width || y >= b->height) return false;
     return b->data[y][x] == 1 || b->data[y][x] == 4;
 }
 
@@ -106,4 +106,16 @@ void ToggleFlag(Board* b, int x, int y)
 {
     if (b->data[y][x] > 2) b->data[y][x] -= 3;
     else b->data[y][x] += 3;
+}
+
+bool IsCleared(Board* b)
+{
+    for (int y = 0; y < b->height; y++)
+    {
+        for (int x = 0; x < b->width; x++)
+        {
+            if (b->data[y][x] == 0 || b->data[y][x] == 3) return false;
+        }
+    }
+    return true;
 }

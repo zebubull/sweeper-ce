@@ -19,5 +19,6 @@ int NearMines(Board* b, int x, int y);
 bool IsMine(Board* b, int x, int y);
 bool IsFlagged(Board* b , int x, int y);
 void ToggleFlag(Board* b, int x, int y);
+bool IsCleared(Board* b);
 
 #endif

@@ -14,11 +14,10 @@ int loop(int width, int height)
     Board* board;
     gfx_tilemap_t* tilemap = CreateTilemap(width, height);
 
-    unsigned int px = width / 2;
-    unsigned int py = height / 2;
+    int px = width / 2;
+    int py = height / 2;
     float fmines = (float)(width * height) * 0.15;
     int mines = (int)fmines;
-    int hidden = height * width - mines;
     int flags = mines;
 
 
@@ -38,13 +37,30 @@ int loop(int width, int height)
         if (kb_FallingEdge(okb_Up, kb_Up) && py > 0) py--;
         if (kb_FallingEdge(okb_Down, kb_Down) && py < height - 1) py++;
 
+        // Check victory before clearing board to make sure all graphics are drawn before the win screen shows
+        if (board && IsCleared(board))
+        {
+            timer_Disable(1);
+            gfx_SetTextFGColor(0x01);
+            gfx_Tilemap_NoClip(tilemap, 0, 0);
+            PrintCenter("you win!");
+            DrawUI(flags, seconds);
+            gfx_SwapDraw();
+            do
+            {
+                ReadKeypad();
+            }
+            while (!kb_FallingEdge(okb_Del, kb_Del));
+            break;
+        }
+
         // Reveal Square
         if (kb_FallingEdge(okb_Enter, kb_Enter) && ((!Cleared(board, px, py) && !IsFlagged(board, px, py)) || first))
         {
             if (first)
             {
                 board = GenerateBoard(width, height, mines, px, py);
-                Reveal(board, px, py, tilemap, &hidden);
+                Reveal(board, px, py, tilemap);
                 timer_Enable(1, TIMER_32K, TIMER_0INT, TIMER_DOWN);
                 first = false;
             }
@@ -55,7 +71,7 @@ int loop(int width, int height)
                 break;
             }
 
-            Reveal(board, px, py, tilemap, &hidden);
+            Reveal(board, px, py, tilemap);
         }
 
         // Toggle Flag
@@ -75,20 +91,6 @@ int loop(int width, int height)
             }
         }
 
-        if (hidden == 0)
-        {
-            timer_Disable(1);
-            gfx_SetTextFGColor(0x01);
-            PrintCenter("you win!");
-            DrawUI(flags, seconds);
-            gfx_SwapDraw();
-            do
-            {
-                ReadKeypad();
-            }
-            while (!kb_FallingEdge(okb_Del, kb_Del));
-            break;
-        }
 
         // Check timer
         if (timer_ChkInterrupt(1, TIMER_RELOADED))
@@ -118,16 +120,15 @@ int loop(int width, int height)
 #define MIN(A, B) (A < B) * A + (B <= A) * B
 #define MAX(A, B) (A > B) * A + (B >= A) * B
 
-void Reveal(Board* b, int x, int y, gfx_tilemap_t* t, int* h)
+void Reveal(Board* b, int x, int y, gfx_tilemap_t* t)
 {
     // Don't do dumb stuff
     if (x < 0 || y < 0 || x >= b->width || y >= b->height) return;
     if (Cleared(b, x, y)) return;
     // Clear and update values
     Clear(b, x, y);
-    *h--;
     int nearby = NearMines(b, x, y);
-    gfx_SetTileMapped(t, x, y, (unsigned char)nearby + 1);
+    gfx_SetTileMapped(t, x, y, nearby + 1);
 
     // If it is a zero, clear surrounding squares
     if (nearby == 0)
@@ -137,7 +138,7 @@ void Reveal(Board* b, int x, int y, gfx_tilemap_t* t, int* h)
             for (int j = MAX(x - 1, 0); j <= MIN(x + 1, b->width); j++)
             {
                 if (IsMine(b, j, i)) continue;
-                Reveal(b, j, i, t, h);
+                Reveal(b, j, i, t);
             }
         } 
     }
