@@ -18,7 +18,7 @@ int loop(int width, int height)
     int py = height / 2;
     float fmines = (float)(width * height) * 0.15;
     int mines = (int)fmines;
-    int flags = mines;
+    int minesLeft = mines;
 
 
     // Set up timer
@@ -44,7 +44,7 @@ int loop(int width, int height)
             gfx_SetTextFGColor(0x01);
             gfx_Tilemap_NoClip(tilemap, 0, 0);
             PrintCenter("you win!");
-            DrawUI(flags, seconds);
+            DrawUI(minesLeft, seconds);
             gfx_SwapDraw();
             do
             {
@@ -67,7 +67,7 @@ int loop(int width, int height)
 
             if (IsMine(board, px, py))
             {
-                Lose(board, tilemap, flags, seconds);
+                Lose(board, tilemap, minesLeft, seconds);
                 break;
             }
 
@@ -81,12 +81,12 @@ int loop(int width, int height)
 
             if (IsFlagged(board, px, py))
             {
-                flags--;
+                minesLeft--;
                 gfx_SetTileMapped(tilemap, px, py, FLAG_TILE);
             }
             else
             {
-                flags++;
+                minesLeft++;
                 gfx_SetTileMapped(tilemap, px, py, HIDDEN_TILE);
             }
         }
@@ -107,7 +107,7 @@ int loop(int width, int height)
         gfx_SetColor(0x01);
         gfx_Rectangle(px * 12 + 80, py * 12, 12, 12);
 
-        DrawUI(flags, seconds);
+        DrawUI(minesLeft, seconds);
         
         gfx_SwapDraw();
     }
@@ -122,15 +122,15 @@ int loop(int width, int height)
 
 void Reveal(Board* b, int x, int y, gfx_tilemap_t* t)
 {
-    // Don't do dumb stuff
+    // Don't check an area outside of the board or a square that is already cleared
     if (x < 0 || y < 0 || x >= b->width || y >= b->height) return;
     if (Cleared(b, x, y)) return;
-    // Clear and update values
+    // Clear the square
     Clear(b, x, y);
     int nearby = NearMines(b, x, y);
     gfx_SetTileMapped(t, x, y, nearby + 1);
 
-    // If it is a zero, clear surrounding squares
+    // If there are no nearby mines, clear surrounding squares
     if (nearby == 0)
     {
         for (int i = MAX(y - 1, 0); i <= MIN(y + 1, b->height); i++)
@@ -144,9 +144,9 @@ void Reveal(Board* b, int x, int y, gfx_tilemap_t* t)
     }
 }
 
-void Lose(Board* b, gfx_tilemap_t* t, int flags, int seconds)
+void Lose(Board* b, gfx_tilemap_t* t, int minesLeft, int seconds)
 {
-    // Reveal all the mines
+    // Reveal all the mine tiles
     for (int y = 0; y < b->height; y++)
     {
         for (int x = 0; x < b->width; x++)
@@ -156,11 +156,11 @@ void Lose(Board* b, gfx_tilemap_t* t, int flags, int seconds)
     }
     gfx_FillScreen(0x02);
     gfx_Tilemap(t, 0, 0);
-
+    
     timer_Disable(1);
     gfx_SetTextFGColor(0x01);
     PrintCenter("you lose");
-    DrawUI(flags, seconds);
+    DrawUI(minesLeft, seconds);
     gfx_SwapDraw();
 
     do
@@ -170,6 +170,7 @@ void Lose(Board* b, gfx_tilemap_t* t, int flags, int seconds)
     while (!kb_FallingEdge(okb_Del, kb_Del));
 }
 
+/*Free resources used by the game*/
 void Cleanup(Board* b, gfx_tilemap_t* t, bool first)
 {
     if (!first)
@@ -178,15 +179,15 @@ void Cleanup(Board* b, gfx_tilemap_t* t, bool first)
         FreeTilemap(t);
 }
 
-void DrawUI(int flags, int seconds)
+void DrawUI(int minesLeft, int seconds)
 {
-    // UI Text
+    // UI Text Colors
     gfx_SetTextFGColor(0x01);
     gfx_SetTextBGColor(0x02);
-    // Total Flags Indicator
+    // Mines Left
     gfx_PrintStringXY("Mines Left:", 2, LCD_HEIGHT - 24);
     gfx_SetTextXY(2, LCD_HEIGHT - 12);
-    gfx_PrintInt(flags, 1);
+    gfx_PrintInt(minesLeft, 1);
     // Controls
     gfx_PrintStringXY("Enter:", 2, 16);
     gfx_PrintStringXY("Reveal", 2, 28);
@@ -199,7 +200,6 @@ void DrawUI(int flags, int seconds)
     // Timer
     int mins = seconds / 60;
     int secs = seconds - mins * 60;
-
     gfx_SetTextXY(2, 2);
     gfx_SetTextFGColor(0x03);
     gfx_PrintInt(mins, 2);
@@ -207,6 +207,7 @@ void DrawUI(int flags, int seconds)
     gfx_PrintInt(secs, 2);
 }
 
+/*Print a message in a box in the center of the screen*/
 void PrintCenter(const char* msg)
 {
     gfx_SetColor(0x02);
